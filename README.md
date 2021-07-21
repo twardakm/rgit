@@ -15,6 +15,7 @@ It may work supplementary `repo` tool (https://android.googlesource.com/tools/re
 **Save scan results in the file and use later to execute some other command**
 
 `rgit scan --relative -s`
+
 `rgit exec -c "status --porcelain"`
 
 ## Using docker to build
