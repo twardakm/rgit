@@ -18,6 +18,24 @@ It may work supplementary `repo` tool (https://android.googlesource.com/tools/re
 
 `rgit exec -c "status --porcelain"`
 
+Example output:
+
+```bash
+VideoStation-FFMPEG-Patcher
+
+collectd/collectd-graph-generator
+ M src/processes/processes_graph.rs
+
+design-patterns
+ M bridge/src/sorter/int_sorter.rs
+ M bridge/src/sorter/mod.rs
+ M bridge/src/sorter_impl/bubble_sort.rs
+ M bridge/src/sorter_impl/insertion_sort.rs
+ M bridge/src/sorter_impl/sorter_impl.rs
+ M bridge/uml/class_diagram.png
+ M bridge/uml/class_diagram.txt
+```
+
 ## Using docker to build
 
 ### Build image
