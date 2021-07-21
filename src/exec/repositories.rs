@@ -29,4 +29,15 @@ impl RepoOperations for Repositories {
         }
         Ok(())
     }
+    /// Executes `git status --porcelain` on all repositories
+    fn porcelain(&self) -> Result<()> {
+        debug!("Executing git status --porcelain on all repositories");
+
+        for repo in &self.repos {
+            repo.porcelain()
+                .context("Failed to execute porcelain command")?;
+        }
+
+        Ok(())
+    }
 }

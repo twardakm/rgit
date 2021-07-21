@@ -11,7 +11,6 @@ use super::repo_operations::RepoOperations;
 /// Struct describing single repository
 pub struct Repo {
     path: PathBuf,
-    repository: Repository,
 }
 
 impl Repo {
@@ -33,11 +32,10 @@ impl Repo {
     /// ```
     pub fn new(path: &str) -> Option<Repo> {
         match Repository::open(path) {
-            Ok(repository) => {
+            Ok(_) => {
                 trace!("Create repo struct for path: {}", path);
                 Some(Repo {
                     path: PathBuf::from(path),
-                    repository: repository,
                 })
             }
             Err(_) => {
@@ -45,6 +43,17 @@ impl Repo {
                 None
             }
         }
+    }
+
+    fn print_path(&self) {
+        print!(
+            "{}{}\n{}{}{}\n",
+            color::Bg(color::Rgb(32, 32, 32)),
+            color::Fg(color::Blue),
+            self.path.to_str().unwrap(),
+            color::Reset.fg_str(),
+            color::Reset.bg_str()
+        );
     }
 }
 
@@ -61,14 +70,7 @@ impl RepoOperations for Repo {
             self.path.to_str().unwrap()
         );
 
-        print!(
-            "{}{}\n{}{}{}\n",
-            color::Bg(color::Rgb(32, 32, 32)),
-            color::Fg(color::Blue),
-            self.path.to_str().unwrap(),
-            color::Reset.fg_str(),
-            color::Reset.bg_str()
-        );
+        self.print_path();
 
         let args: Vec<&str> = cmd.split(" ").collect();
 
@@ -79,6 +81,27 @@ impl RepoOperations for Repo {
             .context(format!("Failed to execute: git {}", cmd))?;
 
         Ok(())
+    }
+    /// Executes `git status --porcelain` on the repository
+    fn porcelain(&self) -> Result<()> {
+        let output = Command::new("git")
+            .current_dir(self.path.to_str().unwrap())
+            .arg("status")
+            .arg("--porcelain")
+            .output()
+            .context("Failed to execute: git status --porcelain")?;
+
+        if output.stdout.len() == 0 {
+            trace!(
+                "Skipping status --porcelain on {}",
+                self.path.to_str().unwrap()
+            );
+            return Ok(());
+        }
+
+        self.print_path();
+
+        Ok(println!("{}", String::from_utf8_lossy(&output.stdout)))
     }
 }
 

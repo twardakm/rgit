@@ -37,7 +37,9 @@ pub fn run(opts: &ExecOpts) -> Result<()> {
     };
 
     if opts.porcelain {
-        unimplemented!();
+        repositories
+            .porcelain()
+            .context("Failed to execute porcelain")?;
     }
 
     match &opts.cmd {
@@ -102,7 +104,7 @@ fn read_repositories_from_file(path: PathBuf) -> Result<Repositories> {
 mod tests {
     use super::*;
     use git2::Repository;
-    use std::io::{prelude::*, LineWriter};
+    use std::io::LineWriter;
     use tempfile::NamedTempFile;
     use tempfile::TempDir;
 
