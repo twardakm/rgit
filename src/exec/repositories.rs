@@ -1,4 +1,4 @@
-use super::repo::Repo;
+use super::{repo::Repo, repo_operations::RepoOperations};
 use anyhow::{Context, Result};
 use log::debug;
 
@@ -12,13 +12,15 @@ impl Repositories {
     pub fn new() -> Repositories {
         Repositories { repos: Vec::new() }
     }
+}
 
+impl RepoOperations for Repositories {
     /// Executes custom git command on all repos
     ///
     /// # Arguments
     ///
     /// * `cmd` - git command to execute
-    pub fn custom_cmd(&self, cmd: String) -> Result<()> {
+    fn custom_cmd(&self, cmd: String) -> Result<()> {
         debug!("Executing command: {} on all repositories", cmd);
 
         for repo in &self.repos {

@@ -59,7 +59,7 @@ pub struct ExecOpts {
     pub source_file: Option<Option<String>>,
     /// [Optional] Executes similar command to `git status --porcelain`
     ///
-    /// It will display only repositories modified in any way with --porcelain result
+    /// It will display only repositories modified in any way with `status --porcelain` result
     #[clap(long)]
     pub porcelain: bool,
     /// [Optional] Executes custom git command on all repositories

@@ -9,6 +9,7 @@ use std::path::PathBuf;
 use crate::options::opts::ExecOpts;
 
 use super::repo::Repo;
+use super::repo_operations::RepoOperations;
 use super::repositories::Repositories;
 
 /// Starts `exec` command

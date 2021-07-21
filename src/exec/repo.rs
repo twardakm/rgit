@@ -6,6 +6,8 @@ use termion::color;
 use std::path::PathBuf;
 use std::process::Command;
 
+use super::repo_operations::RepoOperations;
+
 /// Struct describing single repository
 pub struct Repo {
     path: PathBuf,
@@ -44,13 +46,15 @@ impl Repo {
             }
         }
     }
+}
 
-    /// Executes custom git command
+impl RepoOperations for Repo {
+    /// Executes custom git command on a repository
     ///
     /// # Arguments
     ///
     /// * `cmd` - git command to execute
-    pub fn custom_cmd(&self, cmd: String) -> Result<()> {
+    fn custom_cmd(&self, cmd: String) -> Result<()> {
         trace!(
             "Executing command {} on repo located in {}",
             cmd,
