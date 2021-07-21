@@ -103,6 +103,90 @@ impl RepoOperations for Repo {
 
         Ok(println!("{}", String::from_utf8_lossy(&output.stdout)))
     }
+    /// Finds repositories which have cherry-picks in history
+    fn find_cherry_picks(&self) -> Result<Option<String>> {
+        let reflog = Command::new("git")
+            .current_dir(self.path.to_str().unwrap())
+            .arg("reflog")
+            .output()
+            .context("Failed to execute: git reflog")?;
+        let reflog = String::from_utf8_lossy(&reflog.stdout);
+
+        if reflog.contains("cherry-pick") {
+            self.print_path();
+            return Ok(Some(reflog.to_string()));
+        }
+
+        Ok(None)
+    }
+    /// Prints all cherry picks found in history
+    fn print_cherry_picks(&self) -> Result<()> {
+        match self
+            .find_cherry_picks()
+            .context("Failed to find cherry picks")?
+        {
+            Some(reflog) => {
+                trace!("Printing cherry-picks line by line");
+
+                let _: Vec<_> = reflog
+                    .lines()
+                    .filter(|&line| line.contains("cherry-pick"))
+                    .collect::<Vec<&str>>()
+                    .iter()
+                    .map(|cherry_pick| println!("{}", cherry_pick))
+                    .collect();
+            }
+            None => {}
+        }
+
+        Ok(())
+    }
+    /// Print repository if there is an author in last `number` of commits
+    ///
+    /// # Arguments
+    ///
+    /// * `number` - last number of commits to look into
+    /// * `author` - author to look for
+    fn print_commits_with_author(&self, number: u32, author: &str) -> Result<()> {
+        let number = format!("-{}", number);
+        let args = vec![
+            "log",
+            "--graph",
+            "--pretty=%h -%d %s (%cr) <%an>",
+            "--abbrev-commit",
+            &number,
+        ];
+
+        let log = Command::new("git")
+            .current_dir(self.path.to_str().unwrap())
+            .args(args)
+            .output()
+            .context("Failed to execute: git log")?;
+
+        let log = String::from_utf8(log.stdout)?;
+
+        let commits = log
+            .lines()
+            .filter(|&line| line.contains(author))
+            .collect::<Vec<&str>>();
+
+        if commits.len() == 0 {
+            trace!(
+                "Skipping printing commits with author for {}",
+                self.path.to_str().unwrap()
+            );
+            return Ok(());
+        }
+
+        self.print_path();
+
+        let _: Vec<_> = commits
+            .iter()
+            .map(|commit| println!("{}", commit))
+            .collect();
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]

@@ -26,6 +26,7 @@ pub enum SubCommand {
 
 /// Scans repositories in subdirectories
 #[derive(Clap, Debug)]
+#[clap(setting = AppSettings::ColoredHelp)]
 pub struct ScanOpts {
     /// [Optional] Max depth of subdirectories to scan
     ///
@@ -50,7 +51,16 @@ pub struct ScanOpts {
 }
 
 /// Executes git commands in specified repositories
+///
+/// EXAMPLES:
+///
+/// rgit exec -s --print-cherry-picks --porcelain
+///
+/// rgit scan --relative | rgit exec --print-cherry-picks
+///
+/// rgit exec -s --print-cherry-picks --porcelain --with-author
 #[derive(Clap, Debug)]
+#[clap(setting = AppSettings::ColoredHelp)]
 pub struct ExecOpts {
     /// [Optional] Reads repositories saved in the specified file (by `rgit scan`)
     ///
@@ -62,6 +72,23 @@ pub struct ExecOpts {
     /// It will display only repositories modified in any way with `status --porcelain` result
     #[clap(long)]
     pub porcelain: bool,
+    /// [Optional] Founds repositories which have cherry-picks in git reflog and prints them
+    #[clap(long)]
+    pub find_cherry_picks: bool,
+    /// [Optional] Prints cherry-picks titles in repositories which have cherry-picks in git reflog
+    #[clap(long)]
+    pub print_cherry_picks: bool,
+    /// [Optional] Prints repositories in which current user has commits in last `--number` of commits
+    ///
+    /// By default it looks for commits which belong to current git user
+    #[clap(long)]
+    pub with_author: Option<Option<String>>,
+    /// [Optional] Used for options looking through git log, e.g. `--with-author`, `--show`.
+    /// Specifies number of last commits to look into, default: 10
+    ///
+    /// Ignored when either `--after` or `--before` is specified
+    #[clap(short, long, default_value = "10")]
+    pub number: u32,
     /// [Optional] Executes custom git command on all repositories
     #[clap(short, long)]
     pub cmd: Option<String>,

@@ -7,6 +7,7 @@ use std::io::{prelude::*, BufReader};
 use std::path::PathBuf;
 
 use crate::options::opts::ExecOpts;
+use crate::tools::*;
 
 use super::repo::Repo;
 use super::repo_operations::RepoOperations;
@@ -40,6 +41,32 @@ pub fn run(opts: &ExecOpts) -> Result<()> {
         repositories
             .porcelain()
             .context("Failed to execute porcelain")?;
+    }
+
+    if opts.find_cherry_picks {
+        repositories
+            .find_cherry_picks()
+            .context("Failed to find cherry picks in repositories")?;
+    }
+
+    if opts.print_cherry_picks {
+        repositories
+            .print_cherry_picks()
+            .context("Failed to print cherry picks in repositories")?;
+    }
+
+    match &opts.with_author {
+        Some(author) => {
+            let author = match author {
+                Some(author) => String::from(author),
+                None => get_git_user_name()?,
+            };
+
+            repositories
+                .print_commits_with_author(opts.number, &author)
+                .context("Failed to print commits with author")?;
+        }
+        None => {}
     }
 
     match &opts.cmd {
